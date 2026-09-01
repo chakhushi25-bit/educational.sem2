@@ -1,0 +1,134 @@
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#f4f2ff;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-surface":"#181a2c","primary-container":"#5d5fef","surface":"#fbf8ff","on-primary-fixed-variant":"#2e2bc2","on-tertiary":"#ffffff","on-secondary-fixed":"#0f0d5a","surface-variant":"#e0e0fa","primary-fixed-dim":"#c1c1ff","tertiary-fixed":"#c1e8ff","on-secondary-fixed-variant":"#3d3e87","surface-bright":"#fbf8ff","on-primary-fixed":"#07006c","tertiary-container":"#497890","secondary-fixed-dim":"#c1c1ff","error-container":"#ffdad6","surface-container-lowest":"#ffffff","outline":"#767586","outline-variant":"#c7c4d7","on-tertiary-fixed":"#001e2b","tertiary":"#2e5f76","surface-container":"#edecff","on-error":"#ffffff","secondary-fixed":"#e1dfff","on-tertiary-container":"#f2f9ff","background":"#fbf8ff","secondary-container":"#aeafff","surface-container-high":"#e6e6ff","on-tertiary-fixed-variant":"#174c62","surface-container-low":"#f4f2ff","secondary":"#5557a0","primary":"#4343d5","on-primary":"#ffffff","error":"#ba1a1a","inverse-surface":"#2d2f42","surface-dim":"#d8d8f1","inverse-on-surface":"#f1efff","surface-tint":"#4849da","on-secondary":"#ffffff","on-secondary-container":"#3e3f87","inverse-primary":"#c1c1ff","tertiary-fixed-dim":"#9dcde7","on-primary-container":"#faf7ff","on-surface-variant":"#464555","surface-container-highest":"#e0e0fa","on-error-container":"#93000a","primary-fixed":"#e1e0ff","on-background":"#181a2c"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"xl":"32px","xxl":"48px","gutter":"16px","md":"16px","lg":"24px","sm":"12px","container-padding":"20px","base":"4px","xs":"8px"},"fontFamily":{"label-md":["Inter"],"body-md":["Inter"],"display-lg":["Plus Jakarta Sans"],"headline-sm":["Plus Jakarta Sans"],"label-bold":["Inter"],"headline-md":["Plus Jakarta Sans"],"body-lg":["Inter"]},"fontSize":{"label-md":["12px",{"lineHeight":"16px","fontWeight":"500"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}],"display-lg":["32px",{"lineHeight":"40px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-sm":["20px",{"lineHeight":"28px","fontWeight":"700"}],"label-bold":["12px",{"lineHeight":"16px","fontWeight":"600"}],"headline-md":["24px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}]}}}}</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface-container-low font-headline-sm min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-container-padding flex items-center justify-between"><div class="flex items-center gap-xs"><button class="w-11 h-11 -ml-sm flex items-center justify-center rounded-full hover:bg-surface-container" onclick="history.back()"><span class="material-symbols-outlined text-on-surface">arrow_back_ios_new</span></button><h1 class="text-on-surface font-headline-sm text-headline-sm">Settings</h1></div><div class="flex items-center gap-xs"><button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-container"><span class="material-symbols-outlined text-on-surface-variant">more_vert</span></button></div></div></header><main class="pt-16 bg-surface-container-low min-h-screen"><div class="flex flex-col w-full pb-safe">
+<div class="px-container-padding py-xl text-center">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-fixed mb-sm">
+<span class="material-symbols-outlined text-on-primary-fixed text-headline-sm" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<h2 class="text-display-lg text-on-surface mb-xs">Upgrade your study experience.</h2>
+<p class="text-body-lg text-on-surface-variant max-w-sm mx-auto">Unlock AI-powered scheduling and unlimited practice to master your subjects faster.</p>
+</div>
+<div class="px-container-padding mb-xl">
+<div class="flex items-center justify-center mb-lg">
+<div class="relative bg-surface-container rounded-full p-1 flex">
+<div class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-primary rounded-full transition-transform duration-300 ease-out z-0" id="billing-indicator"></div>
+<button class="relative z-10 w-24 py-1.5 text-label-bold text-on-primary text-center rounded-full transition-colors duration-300" id="btn-monthly" onclick="switchBilling('monthly')">Monthly</button>
+<button class="relative z-10 w-24 py-1.5 text-label-bold text-on-surface-variant text-center rounded-full transition-colors duration-300 flex items-center justify-center gap-1" id="btn-yearly" onclick="switchBilling('yearly')">
+          Yearly <span class="bg-primary-container text-on-primary text-[10px] px-1.5 py-0.5 rounded-full font-bold">Save 35%</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-md relative">
+<!-- Premium Plan (Highlighted) -->
+<div class="relative rounded-2xl bg-surface-container shadow-xl p-lg overflow-hidden flex flex-col z-10">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start mb-md">
+<div>
+<h3 class="text-headline-md text-on-surface flex items-center gap-2">Premium <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">stars</span></h3>
+<p class="text-body-md text-on-surface-variant">For serious learners</p>
+</div>
+<div class="text-right">
+<div class="text-display-lg text-on-surface flex items-start justify-end">
+<span class="text-body-md mt-1 mr-1 text-on-surface-variant">₹</span>
+<span id="price-display">199</span>
+</div>
+<p class="text-label-md text-on-surface-variant" id="billing-cycle-display">/ month</p>
+</div>
+</div>
+<ul class="flex flex-col gap-3 mb-xl flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-body-md text-on-surface">Unlimited AI quizzes &amp; flashcards</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-body-md text-on-surface">Smart auto-rescheduling</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-body-md text-on-surface">Detailed performance analytics</span>
+</li>
+</ul>
+</div>
+<!-- Free Plan -->
+<div class="rounded-2xl bg-surface-container-low p-md flex items-center justify-between opacity-80 z-0">
+<div>
+<h4 class="text-headline-sm text-on-surface">Basic</h4>
+<p class="text-label-md text-on-surface-variant">Currently active</p>
+</div>
+<div class="text-right">
+<span class="text-body-md text-on-surface-variant">Free forever</span>
+</div>
+</div>
+</div>
+</div>
+<div class="px-container-padding mb-xl">
+<h4 class="text-headline-sm text-on-surface mb-md">Payment Details</h4>
+<form class="flex flex-col gap-md">
+<div class="flex flex-col gap-2">
+<label class="text-label-bold text-on-surface">Name on card</label>
+<input class="w-full h-12 px-4 rounded-xl bg-surface text-body-lg text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-shadow" placeholder="John Doe" style="border: 1px solid #E2E2E9;" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-label-bold text-on-surface">Card Information</label>
+<div class="relative">
+<input class="w-full h-12 px-4 rounded-t-xl bg-surface text-body-lg text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 relative z-10 transition-shadow" placeholder="Card number" style="border: 1px solid #E2E2E9; border-bottom: none;" type="text"/>
+<span class="absolute right-4 top-3 text-outline material-symbols-outlined z-20">credit_card</span>
+</div>
+<div class="flex">
+<input class="w-1/2 h-12 px-4 rounded-bl-xl bg-surface text-body-lg text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 relative z-10 transition-shadow" placeholder="MM/YY" style="border: 1px solid #E2E2E9; border-right: none;" type="text"/>
+<input class="w-1/2 h-12 px-4 rounded-br-xl bg-surface text-body-lg text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 relative z-10 transition-shadow" placeholder="CVC" style="border: 1px solid #E2E2E9;" type="text"/>
+</div>
+</div>
+</form>
+</div>
+<div class="px-container-padding pb-xl mt-auto">
+<button class="w-full h-14 bg-primary text-on-primary rounded-xl font-headline-sm flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-[0.98] transition-all shadow-md shadow-primary/20">
+      Start Premium <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<div class="flex items-center justify-center gap-lg mt-md">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-[16px]">lock</span>
+<span class="text-label-md text-outline">Secure payment</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-outline text-[16px]">update</span>
+<span class="text-label-md text-outline">Cancel anytime</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function switchBilling(type) {
+    const indicator = document.getElementById('billing-indicator');
+    const btnMonthly = document.getElementById('btn-monthly');
+    const btnYearly = document.getElementById('btn-yearly');
+    const priceDisplay = document.getElementById('price-display');
+    const cycleDisplay = document.getElementById('billing-cycle-display');
+
+    if (type === 'monthly') {
+      indicator.style.transform = 'translateX(0)';
+      btnMonthly.classList.add('text-on-primary');
+      btnMonthly.classList.remove('text-on-surface-variant');
+      btnYearly.classList.add('text-on-surface-variant');
+      btnYearly.classList.remove('text-on-primary');
+      
+      priceDisplay.textContent = '199';
+      cycleDisplay.textContent = '/ month';
+    } else {
+      indicator.style.transform = 'translateX(100%)';
+      btnYearly.classList.add('text-on-primary');
+      btnYearly.classList.remove('text-on-surface-variant');
+      btnMonthly.classList.add('text-on-surface-variant');
+      btnMonthly.classList.remove('text-on-primary');
+      
+      priceDisplay.textContent = '1,499';
+      cycleDisplay.textContent = '/ year';
+    }
+  }
+</script></main></body></html>
