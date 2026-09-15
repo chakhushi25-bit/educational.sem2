@@ -1,8 +1,10 @@
+import os
 from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
+ENV_PATH = PROJECT_ROOT / ".env"
 TMB_PATH = PROJECT_ROOT / ".tmb"
 
 DATABASE_NAME = "studysync"
@@ -12,10 +14,10 @@ DEFAULT_USER_ID = "user-khushi"
 def _normalize_mongo_uri(raw: str) -> str:
     uri = raw.strip().strip('"').strip("'")
     if not uri:
-        raise RuntimeError(f"MongoDB URL is empty. Put the Atlas URL in {TMB_PATH}")
+        raise RuntimeError("MongoDB URL is empty. Please set MONGODB_URI in .env or .tmb")
 
     if uri.startswith("MONGODB_URI="):
-        uri = uri.split("=", 1)[1].strip()
+        uri = uri.split("=", 1)[1].strip().strip('"').strip("'")
 
     if not uri.startswith("mongodb"):
         uri = f"mongodb+srv://{uri}"
@@ -28,14 +30,24 @@ def _normalize_mongo_uri(raw: str) -> str:
 
 
 def load_mongo_uri() -> str:
-    if not TMB_PATH.exists():
-        raise RuntimeError(f"Missing {TMB_PATH}. Create it with your MongoDB Atlas URL.")
+    # 1. Check environment variable
+    if os.environ.get("MONGODB_URI"):
+        return _normalize_mongo_uri(os.environ["MONGODB_URI"])
 
-    first_non_empty = ""
-    for line in TMB_PATH.read_text(encoding="utf-8").splitlines():
-        stripped = line.strip()
-        if stripped and not stripped.startswith("#"):
-            first_non_empty = stripped
-            break
+    # 2. Check .env file
+    if ENV_PATH.exists():
+        for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if stripped.startswith("MONGODB_URI="):
+                val = stripped.split("=", 1)[1].strip().strip('"').strip("'")
+                if val:
+                    return _normalize_mongo_uri(val)
 
-    return _normalize_mongo_uri(first_non_empty)
+    # 3. Check .tmb file
+    if TMB_PATH.exists():
+        for line in TMB_PATH.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if stripped and not stripped.startswith("#"):
+                return _normalize_mongo_uri(stripped)
+
+    raise RuntimeError(f"Missing MongoDB configuration. Please provide MONGODB_URI in {ENV_PATH} or {TMB_PATH}.")
