@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api } from './api';
+import { api, authStorage } from './api';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import FocusTimerModal from './components/FocusTimerModal';
@@ -11,12 +11,15 @@ import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import StudyPlanPage from './pages/StudyPlanPage';
 import AiAssistantPage from './pages/AiAssistantPage';
+import DocumentVaultPage from './pages/DocumentVaultPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import HistoryPage from './pages/HistoryPage';
 import ProfilePage from './pages/ProfilePage';
 import PremiumPage from './pages/PremiumPage';
 import AboutPage from './pages/AboutPage';
 import TestimonialsPage from './pages/TestimonialsPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 
 import {
   initialUserData,
@@ -26,9 +29,12 @@ import {
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState('dashboard');
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [user, setUser] = useState(initialUserData);
   const [tasks, setTasks] = useState(initialTasks);
   const [studyPlan, setStudyPlan] = useState(initialStudyPlan);
+  const [documents, setDocuments] = useState([]);
+  const [preSelectedSubjectId, setPreSelectedSubjectId] = useState('all');
 
   // Modals & Overlays
   const [isTimerOpen, setIsTimerOpen] = useState(false);
@@ -81,26 +87,53 @@ export default function App() {
     }
   ]);
 
-  useEffect(() => {
-    let cancelled = false;
+  const loadBootstrapData = () => {
     api.bootstrap()
       .then((data) => {
-        if (cancelled) return;
-        if (data.user) setUser(data.user);
+        if (data.user) {
+          setUser(data.user);
+          setIsLoggedIn(true);
+        }
         if (data.tasks) setTasks(data.tasks);
         if (data.studyPlan) setStudyPlan(data.studyPlan);
         if (data.notifications) setNotifications(data.notifications);
         if (data.history) setHistory(data.history);
         if (data.badges) setBadges(data.badges);
         if (data.weeklyAnalytics) setWeeklyAnalytics(data.weeklyAnalytics);
+        if (data.documents) setDocuments(data.documents);
       })
       .catch(() => {
         // Keep local mock data if the API is offline.
       });
-    return () => {
-      cancelled = true;
-    };
+  };
+
+  useEffect(() => {
+    loadBootstrapData();
   }, []);
+
+  // Auth Handlers
+  const handleLoginSuccess = (authUser) => {
+    setUser(authUser);
+    setIsLoggedIn(true);
+    setCurrentTab('dashboard');
+    showToast(`Welcome back, ${authUser.displayName || 'Scholar'}! 🚀`, 'success');
+    loadBootstrapData();
+  };
+
+  const handleSignupSuccess = (newUser) => {
+    setUser(newUser);
+    setIsLoggedIn(true);
+    setCurrentTab('dashboard');
+    showToast(`Welcome to StudySync, ${newUser.displayName}! 🎉 Your syllabus vault is ready.`, 'success');
+    loadBootstrapData();
+  };
+
+  const handleLogout = () => {
+    authStorage.clearToken();
+    setIsLoggedIn(false);
+    setCurrentTab('login');
+    showToast('Signed out successfully. See you next study session!', 'info');
+  };
 
   // Task Actions
   const handleToggleTask = (taskId) => {
@@ -192,25 +225,52 @@ export default function App() {
     api.markNotification(id).catch(() => {});
   };
 
+  const handleOpenAiWithSubject = (subjectId) => {
+    setPreSelectedSubjectId(subjectId);
+    setCurrentTab('assistant');
+  };
+
   return (
     <div className="min-h-screen bg-surface-container-low text-on-surface font-body-lg flex flex-col selection:bg-primary/20 selection:text-primary">
       
       {/* Top Fixed Header */}
-      <Header
-        currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
-        user={user}
-        streakDays={user.streakDays}
-        openTimer={() => {
-          setActiveFocusTask(null);
-          setIsTimerOpen(true);
-        }}
-        notifications={notifications}
-        onNotificationClick={handleNotificationClick}
-      />
+      {currentTab !== 'login' && currentTab !== 'signup' && (
+        <Header
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          user={user}
+          streakDays={user.streakDays || 0}
+          openTimer={() => {
+            setActiveFocusTask(null);
+            setIsTimerOpen(true);
+          }}
+          notifications={notifications}
+          onNotificationClick={handleNotificationClick}
+          onLogout={handleLogout}
+          onOpenLogin={() => setCurrentTab('login')}
+          isLoggedIn={isLoggedIn}
+        />
+      )}
 
       {/* Main Content Area with Dynamic Tab Switching */}
-      <main className="flex-1 pt-16 w-full">
+      <main className={`flex-1 w-full ${currentTab === 'login' || currentTab === 'signup' ? '' : 'pt-16'}`}>
+        
+        {currentTab === 'login' && (
+          <LoginPage
+            onLoginSuccess={handleLoginSuccess}
+            onSwitchToSignup={() => setCurrentTab('signup')}
+            onNavigateHome={() => setCurrentTab('home')}
+          />
+        )}
+
+        {currentTab === 'signup' && (
+          <SignupPage
+            onSignupSuccess={handleSignupSuccess}
+            onSwitchToLogin={() => setCurrentTab('login')}
+            onNavigateHome={() => setCurrentTab('home')}
+          />
+        )}
+
         {currentTab === 'home' && (
           <HomePage 
             setCurrentTab={setCurrentTab} 
@@ -244,7 +304,27 @@ export default function App() {
         )}
 
         {currentTab === 'assistant' && (
-          <AiAssistantPage user={user} />
+          <AiAssistantPage 
+            user={user} 
+            preSelectedSubjectId={preSelectedSubjectId}
+            onOpenVault={() => setCurrentTab('documents')}
+          />
+        )}
+
+        {currentTab === 'documents' && (
+          <DocumentVaultPage
+            user={user}
+            documents={documents}
+            onDocumentUploaded={(doc) => {
+              setDocuments(prev => [doc, ...prev]);
+              showToast(`Uploaded & indexed ${doc.title} with RAG! 📚`, 'success');
+            }}
+            onDocumentDeleted={(docId) => {
+              setDocuments(prev => prev.filter(d => d.id !== docId));
+              showToast('Document removed from knowledge base', 'info');
+            }}
+            onOpenAiWithSubject={handleOpenAiWithSubject}
+          />
         )}
 
         {currentTab === 'analytics' && (
@@ -304,7 +384,9 @@ export default function App() {
       </main>
 
       {/* Mobile Sticky Bottom Navigation */}
-      <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
+      {currentTab !== 'login' && currentTab !== 'signup' && (
+        <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
+      )}
 
       {/* Focus / Pomodoro Timer Modal */}
       <FocusTimerModal

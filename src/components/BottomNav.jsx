@@ -2,10 +2,10 @@ import React from 'react';
 
 export default function BottomNav({ currentTab, setCurrentTab }) {
   const navItems = [
-    { id: 'home', label: 'Home', icon: 'home' },
     { id: 'dashboard', label: 'Planner', icon: 'event_note' },
-    { id: 'assistant', label: 'AI Chat', icon: 'smart_toy', isSpecial: true },
-    { id: 'history', label: 'History', icon: 'history' },
+    { id: 'study_plan', label: 'Plans', icon: 'map' },
+    { id: 'assistant', label: 'AI Tutor', icon: 'smart_toy', isSpecial: true },
+    { id: 'documents', label: 'Vault', icon: 'folder_open' },
     { id: 'profile', label: 'Profile', icon: 'person' }
   ];
 
@@ -23,7 +23,7 @@ export default function BottomNav({ currentTab, setCurrentTab }) {
                 className="flex-1 flex flex-col items-center justify-center -mt-5 group"
                 aria-label="AI Assistant"
               >
-                <div className={`w-13 h-13 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-90 ${
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-90 ${
                   isActive 
                     ? 'bg-primary-container ring-4 ring-primary/20 scale-105' 
                     : 'bg-primary text-white hover:scale-105'
@@ -49,10 +49,10 @@ export default function BottomNav({ currentTab, setCurrentTab }) {
                   : 'text-on-surface-variant hover:text-primary opacity-80'
               }`}
             >
-              <span className={`material-symbols-outlined text-[22px] ${isActive ? 'filled' : ''}`}>
+              <span className={`material-symbols-outlined text-[20px] ${isActive ? 'filled' : ''}`}>
                 {item.icon}
               </span>
-              <span className="text-[11px] font-medium font-label-md">
+              <span className="text-[10px] font-medium font-label-md">
                 {item.label}
               </span>
             </button>

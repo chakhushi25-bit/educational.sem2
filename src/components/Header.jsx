@@ -7,16 +7,20 @@ export default function Header({
   streakDays, 
   openTimer, 
   notifications, 
-  onNotificationClick 
+  onNotificationClick,
+  onLogout,
+  onOpenLogin,
+  isLoggedIn = true,
 }) {
   const [showNotificationsMenu, setShowNotificationsMenu] = useState(false);
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const unreadCount = (notifications || []).filter(n => !n.read).length;
 
   return (
     <header className="fixed top-0 left-0 right-0 w-full z-40 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_1px_12px_rgba(0,0,0,0.03)] transition-all">
       <div className="w-full px-4 sm:px-8 xl:px-12 h-16 flex items-center justify-between">
         
-        {/* Brand Logo & Name - Anchored clearly on top-left */}
+        {/* Brand Logo & Name */}
         <div 
           onClick={() => setCurrentTab('home')}
           className="flex items-center gap-3 cursor-pointer group select-none shrink-0"
@@ -40,12 +44,13 @@ export default function Header({
         </div>
 
         {/* Center Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1 bg-surface-container/70 px-2 py-1 rounded-full border border-outline-variant/30 shadow-inner">
+        <nav className="hidden xl:flex items-center gap-1 bg-surface-container/70 px-2 py-1 rounded-full border border-outline-variant/30 shadow-inner">
           {[
             { id: 'home', label: 'Home', icon: 'home' },
             { id: 'dashboard', label: 'Planner', icon: 'event_note' },
             { id: 'study_plan', label: 'Study Plans', icon: 'map' },
             { id: 'assistant', label: 'AI Tutor', icon: 'smart_toy' },
+            { id: 'documents', label: 'Subject Vault (RAG)', icon: 'folder_open' },
             { id: 'analytics', label: 'Analytics', icon: 'insights' },
             { id: 'history', label: 'History', icon: 'history' },
             { id: 'about', label: 'About', icon: 'info' }
@@ -53,7 +58,7 @@ export default function Header({
             <button
               key={item.id}
               onClick={() => setCurrentTab(item.id)}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                 currentTab === item.id 
                   ? 'bg-primary text-white shadow-sm' 
                   : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
@@ -65,7 +70,7 @@ export default function Header({
           ))}
         </nav>
 
-        {/* Right Actions: Streak, Focus Timer, Pro, Notifications, Profile */}
+        {/* Right Actions */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
           {/* Streak Counter */}
@@ -88,7 +93,7 @@ export default function Header({
             <span>Focus Mode</span>
           </button>
 
-          {/* Upgrade Pill (if not premium) */}
+          {/* Pro Pill */}
           {!user.isPremium && (
             <button
               onClick={() => setCurrentTab('premium')}
@@ -130,7 +135,7 @@ export default function Header({
                 </div>
 
                 <div className="space-y-1.5 max-h-72 overflow-y-auto">
-                  {notifications.map((notif) => (
+                  {(notifications || []).map((notif) => (
                     <div 
                       key={notif.id}
                       onClick={() => {
@@ -157,20 +162,86 @@ export default function Header({
             )}
           </div>
 
-          {/* Profile Avatar */}
-          <div 
-            onClick={() => setCurrentTab('profile')}
-            className="flex items-center gap-2 cursor-pointer group pl-1"
-            title="Open Profile Settings"
-          >
-            <div className="w-9 h-9 rounded-full ring-2 ring-primary/20 group-hover:ring-primary overflow-hidden transition-all shrink-0">
-              <img 
-                src={user.avatarUrl} 
-                alt={user.displayName}
-                className="w-full h-full object-cover"
-              />
+          {/* Profile / Auth Menu */}
+          {isLoggedIn ? (
+            <div className="relative">
+              <div 
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 cursor-pointer group pl-1"
+                title="Account Menu"
+              >
+                <div className="w-9 h-9 rounded-full ring-2 ring-primary/20 group-hover:ring-primary overflow-hidden transition-all shrink-0">
+                  <img 
+                    src={user.avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"} 
+                    alt={user.displayName}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-surface rounded-2xl shadow-2xl border border-outline-variant/30 p-2 z-50 animate-fadeIn space-y-1 text-xs">
+                  <div className="px-3 py-2 border-b border-outline-variant/20 mb-1">
+                    <p className="font-bold text-on-surface text-sm">{user.displayName}</p>
+                    <p className="text-[11px] text-on-surface-variant truncate">{user.email || 'khushi@studysync.ai'}</p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setCurrentTab('profile');
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-on-surface hover:bg-surface-container transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px] text-primary">person</span>
+                    <span>Profile & Preferences</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setCurrentTab('documents');
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-on-surface hover:bg-surface-container transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px] text-secondary">folder_open</span>
+                    <span>Subject Vault (RAG)</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setCurrentTab('premium');
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-on-surface hover:bg-surface-container transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px] text-amber-500">workspace_premium</span>
+                    <span>Upgrade Plan</span>
+                  </button>
+
+                  <div className="border-t border-outline-variant/20 my-1 pt-1" />
+
+                  <button
+                    onClick={() => {
+                      setShowUserMenu(false);
+                      if (onLogout) onLogout();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-error hover:bg-error/10 transition-colors font-medium"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
+          ) : (
+            <button
+              onClick={onOpenLogin}
+              className="px-4 py-2 rounded-full bg-primary text-white text-xs font-bold shadow-md hover:bg-primary-container transition-all"
+            >
+              Sign In
+            </button>
+          )}
 
         </div>
       </div>

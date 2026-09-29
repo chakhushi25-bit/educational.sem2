@@ -1,5 +1,4 @@
 from typing import Any
-
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -20,6 +19,8 @@ class UserProfile(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     id: str = "user-khushi"
+    email: str | None = None
+    passwordHash: str | None = None
     name: str | None = None
     displayName: str
     role: str | None = None
@@ -37,7 +38,62 @@ class UserProfile(BaseModel):
     tasksCompletedThisWeek: int = 0
     totalStudyHoursWeek: float = 0
     isPremium: bool = False
+    openRouterApiKey: str | None = None
+    preferredAiModel: str | None = None
     subjects: list[Subject] = Field(default_factory=list)
+
+
+class SignupRequest(BaseModel):
+    email: str
+    password: str
+    displayName: str
+    university: str | None = "State University"
+    role: str | None = "Undergraduate Scholar"
+    primaryGoal: str | None = "Semester Finals (Target: 3.9 GPA)"
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user: dict[str, Any]
+    message: str | None = None
+
+
+class SubjectDocument(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    id: str
+    userId: str
+    subjectId: str
+    subjectName: str
+    title: str
+    fileName: str
+    fileSize: int
+    uploadedAt: str
+    chunkCount: int = 0
+    summary: str | None = None
+
+
+class RagQueryRequest(BaseModel):
+    question: str
+    subjectId: str | None = None
+    model: str | None = None
+    useRag: bool = True
+    apiKey: str | None = None
+
+
+class PlanGenerationRequest(BaseModel):
+    goalTitle: str
+    targetExam: str | None = None
+    targetDays: int = 30
+    subjectId: str | None = None
+    dailyHours: float = 3.5
+    apiKey: str | None = None
+    model: str | None = None
 
 
 class Task(BaseModel):
@@ -133,10 +189,16 @@ class ChatMessage(BaseModel):
     sender: str
     text: str
     time: str | None = None
+    sources: list[dict[str, Any]] | None = None
+    model: str | None = None
 
 
 class ChatRequest(BaseModel):
     text: str
+    subjectId: str | None = None
+    useRag: bool = True
+    model: str | None = None
+    apiKey: str | None = None
 
 
 class BootstrapPayload(BaseModel):

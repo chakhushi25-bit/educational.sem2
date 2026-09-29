@@ -1,7 +1,10 @@
 from .config import DEFAULT_USER_ID
+from .auth import hash_password
 
 SEED_USER = {
     "id": DEFAULT_USER_ID,
+    "email": "khushi@studysync.ai",
+    "passwordHash": hash_password("password123"),
     "name": "Khushi & Alex",
     "displayName": "Alex Chen",
     "role": "College Junior • Political Science & CS",
@@ -24,7 +27,7 @@ SEED_USER = {
         {"id": "econ", "name": "Macroeconomics", "code": "ECO204", "progress": 75, "color": "text-primary", "bg": "bg-primary/10", "border": "border-primary", "icon": "trending_up"},
         {"id": "hist", "name": "Modern World History", "code": "HIS102", "progress": 90, "color": "text-tertiary", "bg": "bg-tertiary/10", "border": "border-tertiary", "icon": "history_edu"},
         {"id": "math", "name": "Calculus & Linear Algebra", "code": "MTH201", "progress": 42, "color": "text-error", "bg": "bg-error/10", "border": "border-error", "icon": "calculate"},
-        {"id": "cs", "name": "Data Structures & Algorithms", "code": "CS106B", "progress": 68, "color": "text-indigo-600", "bg": "bg-indigo-50", "border": "border-indigo-600", "icon": "code"},
+        {"id": "bio", "name": "General Biology", "code": "BIO101", "progress": 68, "color": "text-emerald-600", "bg": "bg-emerald-50", "border": "border-emerald-600", "icon": "biotech"},
     ],
 }
 
@@ -135,9 +138,102 @@ SEED_TESTIMONIALS = [
     {"id": "t-3", "name": "Elena Rostova", "major": "Economics & Finance", "university": "London School of Economics", "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80", "rating": 5, "metric": "35% Study Time Saved", "text": "The auto-rescheduling is a lifesaver. Whenever I have an unexpected exam or practice session, StudySync recalculates my remaining weeks without any stress."},
 ]
 
+SEED_DOCUMENTS = [
+    {
+        "id": "doc-bio-101",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "bio",
+        "subjectName": "General Biology",
+        "title": "Cellular Respiration & Bioenergetics Syllabus Notes",
+        "fileName": "BIO101_Module_3_Respiration.pdf",
+        "fileSize": 142800,
+        "uploadedAt": "Sep 20, 2026 10:15 AM",
+        "chunkCount": 3,
+        "summary": "Core principles of glycolysis, Krebs Cycle, ATP synthase proton gradients, and oxidative phosphorylation in eukaryotic mitochondria.",
+    },
+    {
+        "id": "doc-econ-204",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "econ",
+        "subjectName": "Macroeconomics",
+        "title": "IS-LM Curve Equilibrium & Monetary Policy",
+        "fileName": "ECO204_IS_LM_Framework.pdf",
+        "fileSize": 218500,
+        "uploadedAt": "Sep 22, 2026 02:40 PM",
+        "chunkCount": 3,
+        "summary": "Goods market IS curve derivation, money market LM curve, fiscal expansion shifts, central bank interest rate targeting, and liquidity trap dynamics.",
+    },
+    {
+        "id": "doc-pol-301",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "pol_sci",
+        "subjectName": "Political Science",
+        "title": "Comparative Federalism & Devolution Case Studies",
+        "fileName": "POL301_Federalism_Constitutions.txt",
+        "fileSize": 89400,
+        "uploadedAt": "Sep 25, 2026 09:30 AM",
+        "chunkCount": 2,
+        "summary": "Distribution of legislative jurisdiction between national and state legislatures, symmetrical vs asymmetrical federalism, and fiscal transfer mechanisms.",
+    }
+]
+
+SEED_CHUNKS = [
+    {
+        "id": "chk-bio-1",
+        "documentId": "doc-bio-101",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "bio",
+        "subjectName": "General Biology",
+        "documentTitle": "Cellular Respiration & Bioenergetics Syllabus Notes",
+        "chunkIndex": 0,
+        "text": "Cellular Respiration occurs in four distinct phases: 1) Glycolysis in the cytoplasm breaks 1 glucose (6C) into 2 pyruvate (3C), netting 2 ATP and 2 NADH. 2) Pyruvate oxidation forms Acetyl-CoA in the mitochondrial matrix releasing CO2. 3) The Citric Acid (Krebs) Cycle yields 2 ATP, 6 NADH, and 2 FADH2 per glucose molecule. 4) Oxidative phosphorylation via the electron transport chain (ETC) drives chemiosmotic ATP synthesis.",
+    },
+    {
+        "id": "chk-bio-2",
+        "documentId": "doc-bio-101",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "bio",
+        "subjectName": "General Biology",
+        "documentTitle": "Cellular Respiration & Bioenergetics Syllabus Notes",
+        "chunkIndex": 1,
+        "text": "ATP Synthase Mechanism: Protons (H+) are pumped across the inner mitochondrial membrane by Complexes I, III, and IV into the intermembrane space, generating a high proton-motive force (electrochemical gradient). As protons flow down their gradient back into the matrix through the F0 rotor subunit of ATP synthase, rotational conformational changes in the F1 catalytic head phosphorylate ADP + Pi into ATP, yielding ~28-32 ATP per glucose.",
+    },
+    {
+        "id": "chk-econ-1",
+        "documentId": "doc-econ-204",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "econ",
+        "subjectName": "Macroeconomics",
+        "documentTitle": "IS-LM Curve Equilibrium & Monetary Policy",
+        "chunkIndex": 0,
+        "text": "The IS Curve represents equilibrium in the goods market where aggregate output Y equals planned expenditure: Y = C(Y - T) + I(r) + G. As real interest rate r falls, investment I rises, increasing national income Y, giving the IS curve a downward slope. Fiscal expansion (increasing government spending G or cutting taxes T) shifts the IS curve rightward.",
+    },
+    {
+        "id": "chk-econ-2",
+        "documentId": "doc-econ-204",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "econ",
+        "subjectName": "Macroeconomics",
+        "documentTitle": "IS-LM Curve Equilibrium & Monetary Policy",
+        "chunkIndex": 1,
+        "text": "The LM Curve represents money market equilibrium where real money supply (M/P) equals real money demand L(r, Y). As income Y increases, demand for transaction money increases, forcing interest rates r upward to equilibrate the money market. An expansionary monetary policy (increasing money supply M) shifts the LM curve rightward and lowers equilibrium interest rates.",
+    },
+    {
+        "id": "chk-pol-1",
+        "documentId": "doc-pol-301",
+        "userId": DEFAULT_USER_ID,
+        "subjectId": "pol_sci",
+        "subjectName": "Political Science",
+        "documentTitle": "Comparative Federalism & Devolution Case Studies",
+        "chunkIndex": 0,
+        "text": "Federalism distributes sovereignty constitutionally between a central union and constituent sub-national states. Symmetrical federalism grants uniform powers to all sub-units, while asymmetrical federalism accords special constitutional autonomy or rights to specific cultural, linguistic, or historical regions (e.g. Quebec in Canada, Catalonia in Spain).",
+    }
+]
+
 
 async def ensure_indexes(database) -> None:
     await database.users.create_index("id", unique=True)
+    await database.users.create_index("email")
     await database.tasks.create_index("id", unique=True)
     await database.tasks.create_index("userId")
     await database.study_plans.create_index("id", unique=True)
@@ -149,6 +245,12 @@ async def ensure_indexes(database) -> None:
     await database.badges.create_index("id", unique=True)
     await database.chat_messages.create_index("userId")
     await database.testimonials.create_index("id", unique=True)
+    await database.subject_documents.create_index("id", unique=True)
+    await database.subject_documents.create_index("userId")
+    await database.subject_documents.create_index("subjectId")
+    await database.subject_chunks.create_index("id", unique=True)
+    await database.subject_chunks.create_index("documentId")
+    await database.subject_chunks.create_index("userId")
 
 
 async def seed_if_empty(database) -> None:
@@ -156,6 +258,13 @@ async def seed_if_empty(database) -> None:
 
     if await database.users.count_documents({}) == 0:
         await database.users.insert_one(SEED_USER)
+    else:
+        # Ensure email and passwordHash are present on default user
+        await database.users.update_one(
+            {"id": DEFAULT_USER_ID, "email": {"$exists": False}},
+            {"$set": {"email": "khushi@studysync.ai", "passwordHash": hash_password("password123")}}
+        )
+
     if await database.tasks.count_documents({}) == 0:
         await database.tasks.insert_many(SEED_TASKS)
     if await database.study_plans.count_documents({}) == 0:
@@ -170,3 +279,7 @@ async def seed_if_empty(database) -> None:
         await database.weekly_analytics.insert_many(SEED_ANALYTICS)
     if await database.testimonials.count_documents({}) == 0:
         await database.testimonials.insert_many(SEED_TESTIMONIALS)
+    if await database.subject_documents.count_documents({}) == 0:
+        await database.subject_documents.insert_many(SEED_DOCUMENTS)
+    if await database.subject_chunks.count_documents({}) == 0:
+        await database.subject_chunks.insert_many(SEED_CHUNKS)

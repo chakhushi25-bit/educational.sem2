@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../api';
 
 export default function NewPlanModal({ isOpen, onClose, onPlanCreated }) {
   const [subject, setSubject] = useState('Organic Chemistry');
@@ -6,6 +7,7 @@ export default function NewPlanModal({ isOpen, onClose, onPlanCreated }) {
   const [targetDate, setTargetDate] = useState('2026-10-15');
   const [dailyHours, setDailyHours] = useState('3');
   const [difficulty, setDifficulty] = useState('Advanced');
+  const [useUploadedDocs, setUseUploadedDocs] = useState(true);
   const [syllabusTopics, setSyllabusTopics] = useState(
     'Alkanes & Cycloalkanes, Stereochemistry, Nucleophilic Substitution (SN1/SN2), Elimination Reactions (E1/E2), Infrared Spectroscopy'
   );
@@ -13,46 +15,85 @@ export default function NewPlanModal({ isOpen, onClose, onPlanCreated }) {
 
   if (!isOpen) return null;
 
-  const handleGenerate = (e) => {
+  const handleGenerate = async (e) => {
     e.preventDefault();
     setIsGenerating(true);
 
-    setTimeout(() => {
-      setIsGenerating(false);
-      const newPlan = {
+    try {
+      if (useUploadedDocs) {
+        const generated = await api.generateRagPlan({
+          goalTitle: `${subject} - ${examName}`,
+          targetExam: `Exam in 30 Days (${targetDate})`,
+          targetDays: 30,
+          dailyHours: parseFloat(dailyHours),
+        });
+        onPlanCreated(generated);
+      } else {
+        const newPlan = {
+          goalTitle: `${subject} - ${examName}`,
+          targetExam: `Exam scheduled in 30 Days`,
+          daysRemaining: 30,
+          totalTopics: syllabusTopics.split(',').length * 4,
+          completedTopics: 0,
+          quizzesScheduled: 12,
+          dailyCommitmentHours: parseFloat(dailyHours),
+          weeks: [
+            {
+              weekNumber: 1,
+              isCurrent: true,
+              title: "Core Mechanics & Molecular Foundations",
+              days: [
+                {
+                  dayName: "Day 1 (Tomorrow)",
+                  items: [
+                    { id: `gen-${Date.now()}-1`, time: "9:00 AM - 10:30 AM", title: "Molecular Orbitals & Resonance", type: "Theory", subject: subject, duration: "60m", description: "Lewis structures, formal charge distribution, and stability.", completed: false },
+                    { id: `gen-${Date.now()}-2`, time: "11:00 AM - 12:00 PM", title: "Stereocenter Configurations (R/S)", type: "Practice", subject: subject, duration: "45m", description: "15 practice problems with Fischer projections.", completed: false }
+                  ]
+                },
+                {
+                  dayName: "Day 2",
+                  items: [
+                    { id: `gen-${Date.now()}-3`, time: "9:00 AM - 10:30 AM", title: "SN1 vs SN2 Reaction Mechanisms", type: "Theory", subject: subject, duration: "60m", description: "Substrate steric hindrance, nucleophile strength, and solvent effects.", completed: false }
+                  ]
+                }
+              ]
+            }
+          ]
+        };
+        onPlanCreated(newPlan);
+      }
+      onClose();
+    } catch (err) {
+      console.error(err);
+      // Fallback
+      onPlanCreated({
         goalTitle: `${subject} - ${examName}`,
-        targetExam: `Exam scheduled in 30 Days`,
+        targetExam: `Target Exam in 30 Days`,
         daysRemaining: 30,
-        totalTopics: syllabusTopics.split(',').length * 4,
+        totalTopics: 20,
         completedTopics: 0,
-        quizzesScheduled: 12,
+        quizzesScheduled: 8,
         dailyCommitmentHours: parseFloat(dailyHours),
         weeks: [
           {
             weekNumber: 1,
             isCurrent: true,
-            title: "Core Mechanics & Molecular Foundations",
+            title: "Foundations & High-Yield Mastery",
             days: [
               {
-                dayName: "Day 1 (Tomorrow)",
+                dayName: "Monday",
                 items: [
-                  { id: `gen-${Date.now()}-1`, time: "9:00 AM - 10:30 AM", title: "Molecular Orbitals & Resonance", type: "Theory", subject: subject, duration: "60m", description: "Lewis structures, formal charge distribution, and stability.", completed: false },
-                  { id: `gen-${Date.now()}-2`, time: "11:00 AM - 12:00 PM", title: "Stereocenter Configurations (R/S)", type: "Practice", subject: subject, duration: "45m", description: "15 practice problems with Fischer projections.", completed: false }
-                ]
-              },
-              {
-                dayName: "Day 2",
-                items: [
-                  { id: `gen-${Date.now()}-3`, time: "9:00 AM - 10:30 AM", title: "SN1 vs SN2 Reaction Mechanisms", type: "Theory", subject: subject, duration: "60m", description: "Substrate steric hindrance, nucleophile strength, and solvent effects.", completed: false }
+                  { id: `gen-${Date.now()}-1`, time: "09:00 AM", title: "Core Concepts Review", type: "Theory", subject, duration: "60m", completed: false }
                 ]
               }
             ]
           }
         ]
-      };
-      onPlanCreated(newPlan);
+      });
       onClose();
-    }, 1800);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -77,7 +118,7 @@ export default function NewPlanModal({ isOpen, onClose, onPlanCreated }) {
               Generate AI Study Plan
             </h2>
             <p className="text-xs text-on-surface-variant">
-              StudySync AI synthesizes your syllabus into an adaptive mastery roadmap.
+              Synthesize your syllabus into an adaptive mastery roadmap.
             </p>
           </div>
         </div>
@@ -158,24 +199,40 @@ export default function NewPlanModal({ isOpen, onClose, onPlanCreated }) {
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold font-label-bold text-on-surface">
-                Syllabus Topics or Chapters
-              </label>
-              <span className="text-[11px] text-primary cursor-pointer hover:underline">
-                Paste syllabus text
-              </span>
+          {/* RAG Grounding Option */}
+          <div className="p-3 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[20px]">folder_open</span>
+              <div>
+                <p className="text-xs font-bold text-on-surface">Ground in Uploaded Subject Documents (RAG)</p>
+                <p className="text-[10px] text-on-surface-variant">Synthesizes actual chapters and topics from your vault</p>
+              </div>
             </div>
-            <textarea
-              rows={3}
-              required
-              value={syllabusTopics}
-              onChange={(e) => setSyllabusTopics(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-outline-variant/40 text-xs text-on-surface focus:outline-none focus:border-primary resize-none"
-              placeholder="Enter topics separated by commas..."
+            <input
+              type="checkbox"
+              checked={useUploadedDocs}
+              onChange={(e) => setUseUploadedDocs(e.target.checked)}
+              className="w-4 h-4 text-primary rounded cursor-pointer"
             />
           </div>
+
+          {!useUploadedDocs && (
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold font-label-bold text-on-surface">
+                  Syllabus Topics or Chapters
+                </label>
+              </div>
+              <textarea
+                rows={3}
+                required={!useUploadedDocs}
+                value={syllabusTopics}
+                onChange={(e) => setSyllabusTopics(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-container-low border border-outline-variant/40 text-xs text-on-surface focus:outline-none focus:border-primary resize-none"
+                placeholder="Enter topics separated by commas..."
+              />
+            </div>
+          )}
 
           {/* AI Features Checklist */}
           <div className="bg-primary-fixed/40 p-3.5 rounded-2xl border border-primary/20 space-y-2">
@@ -198,7 +255,7 @@ export default function NewPlanModal({ isOpen, onClose, onPlanCreated }) {
             {isGenerating ? (
               <>
                 <span className="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
-                <span>Synthesizing AI Roadmap...</span>
+                <span>Synthesizing AI Roadmap from Syllabus...</span>
               </>
             ) : (
               <>
