@@ -47,7 +47,7 @@ https://educational-sem2.chakhushi25.workers.dev/
 
 ## 👩‍💻 Author
 
-Developed as part of an Artificil Intelligence subject assessment.
+Developed as part of an Artificial Intelligence subject assessment.
 
 ---
 
